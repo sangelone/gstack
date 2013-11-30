@@ -8,7 +8,7 @@ to lend flexibility to automatically generated input code.
 
 
 
-**Features include:**
+**Features include**
 - Very forgiving input evaluation
 - Useful debugging mode prints instructions, stack, and friendly error info
 - Continues quickly on most errors
@@ -28,7 +28,7 @@ to lend flexibility to automatically generated input code.
   or user-adjustable number of instructions have been executed (no infinite loops)
 
     
-**Example input:**
+**Example input**
 
     PUSH 2
     JMP 5
@@ -41,7 +41,28 @@ to lend flexibility to automatically generated input code.
     SUB
     JNE -4              ; This is true, so jumps to "END" above
 
+**Example output (with Debug on)**
 
-**TODO:**
+    1 >  PUSH 2
+    [2.0] 
+    
+    2 >  JMP 5
+    [2.0] 
+    
+    7 >  PUSH 3409843028
+    [2.0, 3409843028.0] 
+    
+    8 >  ROT
+    [3409843028.0, 2.0] 
+    
+    9 >  SUB
+    [-3409843026.0] 
+    
+    10 >  JNE -4
+    [-3409843026.0] 
+
+
+**TODO**
 - Add feature to unroll, optimize, and pretty-print
 - Add [de-]serialize so machine can be suspended, restarted
+- Once stable, write a faster intrepeter in Go
