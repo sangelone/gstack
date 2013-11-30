@@ -38,7 +38,7 @@ to lend flexibility to automatically generated input code.
     END
     PUSH 3409843028     ; This is where the "JMP 5" lands
     ROT
-    SUB
+    PUSH -1
     JNE -4              ; This is true, so jumps to "END" above
 
 **Example output (with Debug on)**
@@ -55,12 +55,13 @@ to lend flexibility to automatically generated input code.
     8 >  ROT
     [3409843028.0, 2.0] 
     
-    9 >  SUB
-    [-3409843026.0] 
+    9 >  PUSH -1
+    [3409843028.0, 2.0, -1.0] 
     
     10 >  JNE -4
-    [-3409843026.0] 
-
+    [3409843028.0, 2.0, -1.0] 
+    
+    6 >  END
 
 **TODO**
 - Add feature to unroll, optimize, and pretty-print
