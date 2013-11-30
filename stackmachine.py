@@ -1,7 +1,20 @@
 #!/usr/bin/env python
 
 class Machine():    
+    """ Example usage (see README for more information):
     
+        vm = Machine(Debug=True) # machine created
+        vm.stack = [1, 2, 3]     # your input
+        vm.code = '''            # the code
+            PUSH 5.5
+            MUL
+            ROT
+            MUL
+        '''
+        vm.run()
+        # vm.stack now contains the output
+    """
+
     def __init__(self, debug=False):
         self.stack = []
         self.debug = debug
@@ -178,19 +191,3 @@ class Machine():
                 break
             
         return self.has_errors
-
-
-vm=Machine(1)
-vm.code = """
-    PUSH 2
-    JMP 5
-    PUSH -4.8
-    MUL
-    PUSH 60
-    END
-    PUSH 3409843028     ; This is where the "JMP 5" lands
-    ROT
-    PUSH -1
-    JNE -4              ; This is true, so jumps to "END" above
-"""
-vm.run()
