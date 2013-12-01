@@ -66,8 +66,9 @@ testdata = (
                 PUSH 1
                 PUSH 10
                 MAX
+                DUP
                 """,
-        'out': [1, 10]
+        'out': [1, 10, 10]
     },    
 )
 
