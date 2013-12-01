@@ -1,18 +1,11 @@
 import math
 
 class Machine():    
-    """ Example usage (see README for more information):
-    
-        vm = Machine(Debug=True) # machine created
-        vm.stack = [1, 2, 3]     # your input
-        vm.code = '''            # the code
-            PUSH 5.5
-            MUL
-            ROT
-            MUL
-        '''
-        vm.run()
-        # vm.stack now contains the output
+    """ Simple stack based machine designed for genetic programming (GP) experiments.
+        Easy to use and forgiving with nonfatal errors.
+        
+        See README and tests for examples. Reference implementation, use a faster VM for
+        production.
     """
 
     def __init__(self, debug=False):
@@ -28,6 +21,7 @@ class Machine():
             'POP':  self._pop,
             'SWP':  self._swp,
             'ROT':  self._rot,
+            'DUP':  self._dup,
 
             'MUL':  self._mul,
             'DIV':  self._div,
@@ -39,6 +33,8 @@ class Machine():
             'EXP':  self._exp,
             'LOG':  self._log,
             'TRUNC':self._trunc,
+            'MIN':  self._min,
+            'MAX':  self._max,
 
             'JMP':  self._jmp,
             'JZ':   self._jz,
@@ -64,7 +60,9 @@ class Machine():
     def _pop(self):
         if self.stack:
             self.stack.pop()
-    
+
+    # TODO: generalize. The arity=2 instructions below follow the same pattern.
+
     def _mul(self):
         if len(self.stack) < 2:
             self.stack = [0]
@@ -121,6 +119,20 @@ class Machine():
         if self.stack:
             self.stack.append(math.trunc(self.stack.pop()))
 
+    def _min(self):
+        if len(self.stack) < 2:
+            self.stack = [0]
+        else:
+            val = min(self.stack.pop(), self.stack.pop())
+            self.stack.append(val)
+
+    def _max(self):
+        if len(self.stack) < 2:
+            self.stack = [0]
+        else:
+            val = max(self.stack.pop(), self.stack.pop())
+            self.stack.append(val)
+
     def _swp(self):
         if len(self.stack) > 1:
             self.stack[-2], self.stack[-1] = self.stack[-1], self.stack[-2]
@@ -128,6 +140,10 @@ class Machine():
     def _rot(self):
         if len(self.stack) > 1:
             self.stack = self.stack[1:] + self.stack[:1]
+
+    def _dup(self):
+        if self.stack:
+            self.stack.append(self.stack[-1])
 
     def _jmp(self, a):
         try:

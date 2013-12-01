@@ -10,7 +10,7 @@ from stackmachine import Machine
 
 
 # Flip this is a test fails or you are adding new tests to get useful debug output
-verbose = False
+verbose = True
 
 testdata = (
     {   'in': [],
@@ -59,6 +59,15 @@ testdata = (
                 LOG         ; natural log
                 """,
         'out': [0.0]
+    },    
+    {   'in': [1, 5],
+        'code': """
+                MIN
+                PUSH 1
+                PUSH 10
+                MAX
+                """,
+        'out': [1, 10]
     },    
 )
 
