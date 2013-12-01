@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+import math
 
 class Machine():    
     """ Example usage (see README for more information):
@@ -34,6 +34,11 @@ class Machine():
             'MOD':  self._mod,
             'ADD':  self._add,
             'SUB':  self._sub,
+            'MOD':  self._sub,
+            'SUB':  self._sub,
+            'EXP':  self._exp,
+            'LOG':  self._log,
+            'TRUNC':self._trunc,
 
             'JMP':  self._jmp,
             'JZ':   self._jz,
@@ -72,7 +77,7 @@ class Machine():
         if len(self.stack) < 2:
             self.stack = [0]
         else:
-            val = self.stack[-1] // self.stack[-2]
+            val = self.stack[-1] / self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
     
@@ -99,6 +104,22 @@ class Machine():
             val = self.stack[-1] - self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
+
+    def _exp(self):
+        if len(self.stack) < 2:
+            self.stack = [0]
+        else:
+            val = math.pow(self.stack[-1], self.stack[-2])
+            self.stack = self.stack[:-2]
+            self.stack.append(val)
+
+    def _log(self):
+        if self.stack:
+            self.stack.append(math.log(self.stack.pop()))
+
+    def _trunc(self):
+        if self.stack:
+            self.stack.append(math.trunc(self.stack.pop()))
 
     def _swp(self):
         if len(self.stack) > 1:
