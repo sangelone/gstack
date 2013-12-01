@@ -17,7 +17,7 @@ class Machine():
 
         self.instructions = {
             'CLR':  self._clr,
-            'PUSH': self._push,
+            'PUSH': self._push, # takes 1 value
             'POP':  self._pop,
             'SWP':  self._swp,
             'ROT':  self._rot,
@@ -28,8 +28,6 @@ class Machine():
             'MOD':  self._mod,
             'ADD':  self._add,
             'SUB':  self._sub,
-            'MOD':  self._sub,
-            'SUB':  self._sub,
             'EXP':  self._exp,
             'LOG':  self._log,
             'TRUNC':self._trunc,
@@ -37,7 +35,7 @@ class Machine():
             'MAX':  self._max,
             'INC':  self._inc,
 
-            'JMP':  self._jmp,
+            'JMP':  self._jmp, # all jumps take an offset value
             'JZ':   self._jz,
             'JE':   self._je,
             'JNE':  self._jne,
