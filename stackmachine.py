@@ -35,6 +35,7 @@ class Machine():
             'TRUNC':self._trunc,
             'MIN':  self._min,
             'MAX':  self._max,
+            'INC':  self._inc,
 
             'JMP':  self._jmp,
             'JZ':   self._jz,
@@ -133,6 +134,10 @@ class Machine():
             val = max(self.stack.pop(), self.stack.pop())
             self.stack.append(val)
 
+    def _inc(self):
+        if self.stack:
+            self.stack[-1] += 1
+
     def _swp(self):
         if len(self.stack) > 1:
             self.stack[-2], self.stack[-1] = self.stack[-1], self.stack[-2]
@@ -157,29 +162,27 @@ class Machine():
 
     def _jz(self, a):
         if self.stack:
-            # uses a pop, eating the zero value,
-            # unlike other conditional jumps because it's meant for looping
             if self.stack.pop() == 0:
                 self._jmp(a)
 
     def _je(self, a):
         if len(self.stack) > 1:
-            if self.stack[-1] == self.stack[-2]:
+            if self.stack.pop() == self.stack.pop():
                 self._jmp(a)
 
     def _jne(self, a):
         if len(self.stack) > 1:
-            if self.stack[-1] != self.stack[-2]:
+            if self.stack.pop() != self.stack.pop():
                 self._jmp(a)
 
     def _jlt(self, a):
         if len(self.stack) > 1:
-            if self.stack[-1] < self.stack[-2]:
+            if self.stack.pop() < self.stack.pop():
                 self._jmp(a)
 
     def _jgt(self, a):
         if len(self.stack) > 1:
-            if self.stack[-1] > self.stack[-2]:
+            if self.stack.pop() > self.stack.pop():
                 self._jmp(a)
     
     def code_listing(self):

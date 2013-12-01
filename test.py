@@ -10,7 +10,7 @@ from stackmachine import Machine
 
 
 # Flip this is a test fails or you are adding new tests to get useful debug output
-verbose = True
+verbose = False
 
 testdata = (
     {   'in': [],
@@ -67,8 +67,22 @@ testdata = (
                 PUSH 10
                 MAX
                 DUP
+                INC
                 """,
-        'out': [1, 10, 10]
+        'out': [1, 10, 11]
+    },
+    {   'in': [],
+        'code': """
+                PUSH 1      ; count to 10 with a loop
+                DUP
+                DUP
+                PUSH 10
+                JE 3
+                INC
+                JMP -5
+                POP
+                """,
+        'out': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     },    
 )
 
@@ -82,5 +96,7 @@ for t in testdata:
         print "Error!"
         print "Excpected:", t['out']
         print "Result was:", vm.stack
+        print "Code:"
+        vm.code_listing()
     else:
         print "Test passed! Result:", t['out']
