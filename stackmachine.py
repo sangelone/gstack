@@ -52,9 +52,9 @@ class Machine():
     def _push(self, a):
         try:
             a = float(a)
+            self.stack.append(a)
         except:
-            a = a.strip('\'"`')
-        self.stack.append(a)
+            pass
     
     def _pop(self):
         if self.stack:
@@ -184,6 +184,12 @@ class Machine():
             if self.stack.pop() > self.stack.pop():
                 self._jmp(a)
     
+    def verify_stack(self):
+        for v in self.stack:
+            if not (isinstance(v, float) or isinstance(v, int)):
+                return False
+        return True
+
     def code_listing(self):
         self.lines = self.code.split('\n')
         for num, line in enumerate(self.lines):
@@ -220,6 +226,10 @@ class Machine():
         self._lines_executed = 0
         self.has_errors = False
         self.lines = self.code.split('\n')
+        
+        if not self.verify_stack():
+            if self.debug: print "Invalid stack, must only contain numbers"
+            return
 
         while(self.evaluate(self.lines[self._curline])):
             self._lines_executed += 1

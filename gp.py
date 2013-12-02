@@ -1,6 +1,9 @@
 from stackmachine import Machine
 from random import randint, random, choice
 
+""" Still in development, do not use this module yet. Here be dragons, etc.
+"""
+
 
 def random_integer():
     return str(randint(-5, 5))
@@ -62,8 +65,6 @@ vm = Machine()
 vm._max_runlines = 500
 instr = vm.instructions.keys()  # Full set
 instr = ['INC', 'ADD', 'PUSH', 'JZ', 'JE', 'JMP', 'JGT', 'JLT', 'SUB', 'POP', 'SWP', 'DUP'] # Custom set
-print instr
-
 
 code = random_code(7)
 best_fitness = find_fitness(vm, code)
