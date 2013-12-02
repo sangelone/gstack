@@ -153,6 +153,7 @@ class Machine():
             n = self._curline + int(a)
         except:
             return
+        if n == self._curline: return
         if n < 0: return
         if n > len(self.lines) - 1: return
         # offset being incremented after returning when calculating IP
@@ -217,6 +218,7 @@ class Machine():
     def run(self):
         self._curline = 0
         self._lines_executed = 0
+        self.has_errors = False
         self.lines = self.code.split('\n')
 
         while(self.evaluate(self.lines[self._curline])):

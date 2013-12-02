@@ -3,10 +3,10 @@ from random import randint, random, choice
 
 
 def random_integer():
-    return str(randint(-50, 50))
+    return str(randint(-5, 5))
 
 def random_float():
-    return str((random() * 200.0) - 100.0)
+    return str((random() * 2.0) - 1.0)
 
 def random_instruction():
     needs_int = ('JMP', 'JZ', 'JE', 'JNE', 'JLT', 'JGT')
@@ -29,10 +29,17 @@ def random_code(length):
     return code
 
 def fitness(result):
-    return len(result)  # Dumb one, just go for the longest stack
+    f = 0
+    for i in range(100):
+        try:
+            if result[i] == i*2:
+                f += 1
+        except: pass
+    return f
 
 def find_fitness(vm, code):
     vm.code = code
+    vm.stack = []
     vm.run()
     return fitness(vm.stack)
 
@@ -52,12 +59,33 @@ def modify_mutate(code, count):
     return '\n'.join(lines)
 
 vm = Machine()
-instr = vm.instructions.keys()
+vm._max_runlines = 500
+instr = vm.instructions.keys()  # Full set
+instr = ['INC', 'ADD', 'PUSH', 'JZ', 'JE', 'JMP', 'JGT', 'JLT', 'SUB', 'POP', 'SWP', 'DUP'] # Custom set
+print instr
 
-code = random_code(10)
 
-for i in range(20):
-    print find_fitness(vm, code)
-    code = modify_mutate(code, 5)
-    print find_fitness(vm, code)
+code = random_code(7)
+best_fitness = find_fitness(vm, code)
+i = 0
 
+while best_fitness < 100:
+    i += 1
+    trial_code = modify_mutate(code, randint(1, 5))
+    if randint(1,5) == 1:
+        trial_code = random_code(7)
+    trial_fitness = find_fitness(vm, trial_code)
+
+    # Apply pressure to not have infinite loops or other 'errors'
+    if (best_fitness > 2 or trial_fitness > 2) and vm.has_errors:
+        continue
+
+    if trial_fitness > best_fitness:
+        code = trial_code
+        best_fitness = trial_fitness
+    if i % 100 == 0: print i, best_fitness, '\n', code, '\n'
+
+print best_fitness
+vm.code_listing()
+print vm.stack
+print vm.has_errors
