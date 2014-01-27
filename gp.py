@@ -64,7 +64,7 @@ def modify_mutate(code, count):
 vm = Machine()
 vm._max_runlines = 500
 instr = vm.instructions.keys()  # Full set
-instr = ['INC', 'ADD', 'PUSH', 'JZ', 'JE', 'JMP', 'JGT', 'JLT', 'SUB', 'POP', 'SWP', 'DUP'] # Custom set
+instr = ['INC', 'ADD', 'PUSH', 'JZ', 'JE', 'JMP', 'JGT', 'JLT', 'SUB', 'POP', 'SWP', 'DUP', 'TRUNC'] # Custom set
 
 code = random_code(7)
 best_fitness = find_fitness(vm, code)
