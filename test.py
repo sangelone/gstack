@@ -6,10 +6,12 @@ from stackmachine import Machine
 """ A series of simple tests. Specify the input stack and the code and the
     expected resulting stack. Not all features and instructions are covered
     yet. The vm it runs against does not have any parameters changed.
+
+    TODO: convert this to PyUnit or Nose when packaging/installing is added
 """
 
 
-# Flip this is a test fails or you are adding new tests to get useful debug output
+# Flip this if a test fails or you are adding new tests to get useful debug output
 verbose = False
 
 testdata = (
@@ -98,5 +100,5 @@ for t in testdata:
         print "Result was:", vm.stack
         print "Code:"
         vm.code_listing()
-    else:
-        print "Test passed! Result:", t['out']
+    elif verbose:
+        print "Test passed! Result:", vm.out
