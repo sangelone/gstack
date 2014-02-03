@@ -101,4 +101,4 @@ for t in testdata:
         print "Code:"
         vm.code_listing()
     elif verbose:
-        print "Test passed! Result:", vm.out
+        print "Test passed! Result:", vm.stack
