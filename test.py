@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from stackmachine import Machine
+from timeit import timeit
+from random import choice
 
 
 """ A series of simple tests. Specify the input stack and the code and the
@@ -61,7 +63,7 @@ testdata = (
                 LOG         ; natural log
                 """,
         'out': [0.0]
-    },    
+    },
     {   'in': [1, 5],
         'code': """
                 MIN
@@ -85,20 +87,40 @@ testdata = (
                 POP
                 """,
         'out': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    },    
+    },
 )
 
-vm = Machine(verbose)
-for t in testdata:
-    vm.stack = t['in']
-    vm.code = t['code']
-    vm.run()
+def calc_speed(iters, instructions=20):
+    instr = ['POP','SWP','ROT','DUP','MUL','DIV','ADD','SUB','EXP','LOG','TRUNC']
+    code = '\n'.join([choice(instr) for i in xrange(instructions)])
+    setup = '''
+from stackmachine import Machine
+vm = Machine()
+vm.code = """
+    ''' + code + '''
+    """
+    '''
+    return 1/(timeit('vm.stack=[5]*20;vm.run()', setup, number=iters) / iters * instructions)
 
-    if vm.has_errors or vm.stack != t['out']:
-        print "Error!"
-        print "Excpected:", t['out']
-        print "Result was:", vm.stack
-        print "Code:"
-        vm.code_listing()
-    elif verbose:
-        print "Test passed! Result:", vm.stack
+
+if __name__ == '__main__':
+    vm = Machine(verbose)
+    for t in testdata:
+        vm.stack = t['in']
+        vm.code = t['code']
+        vm.run()
+
+        if vm.has_errors or vm.stack != t['out']:
+            print "Test failed!\nExcpected:", t['out']
+            print "Result was:", vm.stack
+            print "Code:"
+            vm.code_listing()
+            print
+        elif verbose:
+            print "Test passed! Result:", vm.stack
+
+    ips = calc_speed(iters=20000)
+    if ips < 100:
+        print "Warning: this machine may be too slow for this VM at", ips, "instructions per second"
+    if verbose:
+        print "Speed test results:\n", ips, "instructions per second =", ips / 1000000, "BogoMips"

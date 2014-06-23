@@ -1,19 +1,20 @@
 import math
 
-class Machine():    
-    """ Simple stack based machine designed for genetic programming (GP) experiments.
-        Easy to use and forgiving with nonfatal errors.
-        
-        See README and tests for examples. Reference implementation, use a faster VM for
-        production.
+class Machine():
+    """Simple stack based machine designed for genetic programming (GP) experiments.
+       Easy to use and forgiving with nonfatal errors.
+
+       See README and tests for examples.
     """
 
     def __init__(self, debug=False):
         self.stack = []
         self.debug = debug
         self.code = ""
+        self.stack_safety = False
         self.has_errors = False
         self._max_runlines = 100
+        self._max_stack = 1000
 
         self.instructions = {
             'CLR':  self._clr,
@@ -44,7 +45,7 @@ class Machine():
 
             'END':  None
         }
-    
+
 
     def _clr(self):
         self.stack = []
@@ -55,7 +56,7 @@ class Machine():
             self.stack.append(a)
         except:
             pass
-    
+
     def _pop(self):
         if self.stack:
             self.stack.pop()
@@ -69,7 +70,7 @@ class Machine():
             val = self.stack[-1] * self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
-    
+
     def _div(self):
         if len(self.stack) < 2:
             self.stack = [0]
@@ -77,7 +78,7 @@ class Machine():
             val = self.stack[-1] / self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
-    
+
     def _mod(self):
         if len(self.stack) < 2:
             self.stack = [0]
@@ -85,7 +86,7 @@ class Machine():
             val = self.stack[-1] % self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
-    
+
     def _add(self):
         if len(self.stack) < 2:
             self.stack = [0]
@@ -93,7 +94,7 @@ class Machine():
             val = self.stack[-1] + self.stack[-2]
             self.stack = self.stack[:-2]
             self.stack.append(val)
-    
+
     def _sub(self):
         if len(self.stack) < 2:
             self.stack = [0]
@@ -139,7 +140,7 @@ class Machine():
     def _swp(self):
         if len(self.stack) > 1:
             self.stack[-2], self.stack[-1] = self.stack[-1], self.stack[-2]
-    
+
     def _rot(self):
         if len(self.stack) > 1:
             self.stack = self.stack[1:] + self.stack[:1]
@@ -183,61 +184,66 @@ class Machine():
         if len(self.stack) > 1:
             if self.stack.pop() > self.stack.pop():
                 self._jmp(a)
-    
+
     def verify_stack(self):
-        for v in self.stack:
-            if not (isinstance(v, float) or isinstance(v, int)):
-                return False
-        return True
+        if len(self.stack) > self._max_stack:
+            return False
+        allowed_types = [int, float, long]
+        return all([type(v) in allowed_types for v in self.stack])
 
     def code_listing(self):
         self.lines = self.code.split('\n')
         for num, line in enumerate(self.lines):
             line = line.strip().upper()
             print num, '\t', line
-        
+
     def evaluate(self, line):
-        line = line.split(';')[0]
-        line = line.strip().upper()
         if line:
-            if self.debug: print self._curline, '> ', line
-    
+            debug = self.debug
+            if debug: print self._curline, '> ', line
+
             tokens = line.split()
             instr = tokens[0]
             if instr == 'END': return False
-            
+
             if len(tokens) > 1:
                 values = tokens [1:]
             else: values = []
-            
+
             try:
                 self.instructions[instr](*values)
             except Exception as e:
-                if self.debug: print "Error:", e
+                if debug: print "Error:", e
                 self.has_errors = True
-    
-            if self.debug: print self.stack, '\n'
-            
+
+            if debug: print self.stack, '\n'
+
         self._curline += 1
         return True
-    
+
     def run(self):
+        # Note: some class members are duplicated with locals for faster comparisons in the main loop
         self._curline = 0
-        self._lines_executed = 0
         self.has_errors = False
-        self.lines = self.code.split('\n')
-        
-        if not self.verify_stack():
-            if self.debug: print "Invalid stack, must only contain numbers"
+        self._lines_executed = 0
+        lines_exec = 0
+        max_exec = self._max_runlines
+
+        lines = [line.split(';')[0].strip().upper() for line in self.code.split('\n')]
+        self.lines = lines
+
+        if self.stack_safety and not self.verify_stack():
+            if self.debug: print "Invalid stack, must only contain ints, longs, and floats"
             return
 
         while(self.evaluate(self.lines[self._curline])):
-            self._lines_executed += 1
-            if self._lines_executed > self._max_runlines:
+            lines_exec += 1
+            if lines_exec > max_exec:
                 if self.debug: print "Reached maximum runlines:", self._max_runlines
                 self.has_errors = True
                 break
             if self._curline >= len(self.lines):
                 break
-            
+
+        self._lines_executed = lines_exec
         return self.has_errors
