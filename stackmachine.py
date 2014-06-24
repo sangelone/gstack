@@ -1,3 +1,4 @@
+import operator
 import math
 
 class Machine():
@@ -23,18 +24,19 @@ class Machine():
             'SWP':  self._swp,
             'ROT':  self._rot,
             'DUP':  self._dup,
-
-            'MUL':  self._mul,
-            'DIV':  self._div,
-            'MOD':  self._mod,
-            'ADD':  self._add,
-            'SUB':  self._sub,
-            'EXP':  self._exp,
-            'LOG':  self._log,
-            'TRUNC':self._trunc,
-            'MIN':  self._min,
-            'MAX':  self._max,
             'INC':  self._inc,
+
+            'MUL':  lambda: self._operator2(operator.mul),
+            'DIV':  lambda: self._operator2(operator.div),
+            'MOD':  lambda: self._operator2(operator.mod),
+            'ADD':  lambda: self._operator2(operator.add),
+            'SUB':  lambda: self._operator2(operator.sub),
+            'EXP':  lambda: self._operator2(operator.pow),
+            'MIN':  lambda: self._operator2(min),
+            'MAX':  lambda: self._operator2(max),
+
+            'LOG':  lambda: self._operator1(math.log),
+            'TRUNC':lambda: self._operator1(math.trunc),
 
             'JMP':  self._jmp, # all jumps take an offset value
             'JZ':   self._jz,
@@ -46,6 +48,17 @@ class Machine():
             'END':  None
         }
 
+    def _operator1(self, operator):
+        if self.stack:
+            self.stack.append(operator(self.stack.pop()))
+
+    def _operator2(self, operator):
+        if len(self.stack) < 2:
+            self.stack = [0]
+        else:
+            val = operator(self.stack[-1], self.stack[-2])
+            self.stack = self.stack[:-2]
+            self.stack.append(val)
 
     def _clr(self):
         self.stack = []
@@ -60,78 +73,6 @@ class Machine():
     def _pop(self):
         if self.stack:
             self.stack.pop()
-
-    # TODO: generalize. The arity=2 instructions below follow the same pattern.
-
-    def _mul(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = self.stack[-1] * self.stack[-2]
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _div(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = self.stack[-1] / self.stack[-2]
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _mod(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = self.stack[-1] % self.stack[-2]
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _add(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = self.stack[-1] + self.stack[-2]
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _sub(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = self.stack[-1] - self.stack[-2]
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _exp(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = math.pow(self.stack[-1], self.stack[-2])
-            self.stack = self.stack[:-2]
-            self.stack.append(val)
-
-    def _log(self):
-        if self.stack:
-            self.stack.append(math.log(self.stack.pop()))
-
-    def _trunc(self):
-        if self.stack:
-            self.stack.append(math.trunc(self.stack.pop()))
-
-    def _min(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = min(self.stack.pop(), self.stack.pop())
-            self.stack.append(val)
-
-    def _max(self):
-        if len(self.stack) < 2:
-            self.stack = [0]
-        else:
-            val = max(self.stack.pop(), self.stack.pop())
-            self.stack.append(val)
 
     def _inc(self):
         if self.stack:
@@ -157,7 +98,6 @@ class Machine():
         if n == self._curline: return
         if n < 0: return
         if n > len(self.lines) - 1: return
-        # offset being incremented after returning when calculating IP
         self._curline = n-1
 
     def _jz(self, a):
