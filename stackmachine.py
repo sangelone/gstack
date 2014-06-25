@@ -14,7 +14,7 @@ class Machine():
         self.code = ""
         self.stack_safety = False
         self.has_errors = False
-        self._max_runlines = 100
+        self._max_runlines = 1000
         self._max_stack = 1000
 
         self.instructions = {
@@ -91,13 +91,9 @@ class Machine():
             self.stack.append(self.stack[-1])
 
     def _jmp(self, a):
-        try:
-            n = self._curline + int(a)
-        except:
+        n = self._curline + int(a)
+        if n == self._curline or n < 0 or n > len(self.lines) - 1:
             return
-        if n == self._curline: return
-        if n < 0: return
-        if n > len(self.lines) - 1: return
         self._curline = n-1
 
     def _jz(self, a):

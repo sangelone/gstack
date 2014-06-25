@@ -6,6 +6,9 @@ A stack-based VM implementing a very small instruction set
 meant for use in genetic programming. It is very forgiving
 to lend flexibility to automatically generated input code.
 
+Recommend using PyPy with JIT to reach a few thousand instructions
+per second.
+
 
 
 **Features include**
@@ -27,43 +30,58 @@ to lend flexibility to automatically generated input code.
 - Program ends when there are no more lines, an error, reaches END,
   or user-adjustable number of instructions have been executed (no infinite loops)
 
-    
+
 **Example input**
 
-    PUSH 2
-    JMP 5
-    PUSH -4.8
-    MUL
-    PUSH 60
-    END
-    PUSH 3409843028     ; This is where the "JMP 5" lands
-    ROT
-    PUSH -1
-    JNE -4              ; This is true, so jumps to "END" above
+    PUSH 1      ; count to 100 with a loop
+    DUP
+    DUP
+    PUSH 100
+    JE 3        ; if the current number = 100, jump to end
+    INC
+    JMP -5      ; not done, continue looping
+    POP         ; end (remove trailing test number)
 
 **Example output (with Debug on)**
 
-    1 >  PUSH 2
-    [2.0] 
-    
-    2 >  JMP 5
-    [2.0] 
-    
-    7 >  PUSH 3409843028
-    [2.0, 3409843028.0] 
-    
-    8 >  ROT
-    [3409843028.0, 2.0] 
-    
-    9 >  PUSH -1
-    [3409843028.0, 2.0, -1.0] 
-    
-    10 >  JNE -4
-    [3409843028.0, 2.0, -1.0] 
-    
-    6 >  END
+    1 >  PUSH 1
+    [1.0]
+
+    2 >  DUP
+    [1.0, 1.0]
+
+    3 >  DUP
+    [1.0, 1.0, 1.0]
+
+    4 >  PUSH 100
+    [1.0, 1.0, 1.0, 100.0]
+
+    5 >  JE 3
+    [1.0, 1.0]
+
+    6 >  INC
+    [1.0, 2.0]
+
+    7 >  JMP -5
+    [1.0, 2.0]
+
+    2 >  DUP
+    [1.0, 2.0, 2.0]
+
+    3 >  DUP
+    [1.0, 2.0, 2.0, 2.0]
+
+    4 >  PUSH 100
+    [1.0, 2.0, 2.0, 2.0, 100.0]
+
+    5 >  JE 3
+    [1.0, 2.0, 2.0]
+
+    6 >  INC
+    [1.0, 2.0, 3.0]
+    .
+    .
+    . etc
 
 **TODO**
-- Add feature to unroll, optimize, and pretty-print
-- Add [de-]serialize so machine can be suspended, restarted
-- Once stable, write a faster intrepeter in Go
+- Add features to unroll, optimize, and pretty-print

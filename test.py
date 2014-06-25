@@ -77,16 +77,16 @@ testdata = (
     },
     {   'in': [],
         'code': """
-                PUSH 1      ; count to 10 with a loop
+                PUSH 1      ; count to 100 with a loop
                 DUP
                 DUP
-                PUSH 10
+                PUSH 100
                 JE 3
                 INC
                 JMP -5
                 POP
                 """,
-        'out': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        'out': range(1, 101)
     },
 )
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             print "Test passed! Result:", vm.stack
 
     ips = calc_speed(iters=20000)
-    if ips < 100:
+    if ips < 400:
         print "Warning: this machine may be too slow for this VM at", ips, "instructions per second"
     if verbose:
         print "Speed test results:\n", ips, "instructions per second =", ips / 1000000, "BogoMips"
